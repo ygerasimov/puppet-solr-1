@@ -54,13 +54,18 @@ class solr::install ($source_url, $home_dir, $solr_data_dir, $package, $cores, $
   }
 
   # Ensure solr dist directory exist, with the appropriate privileges and copy contents of tar'd dist directory
+  $tomcat_user = $::osfamily ? {
+    'debian' => 'tomcat6',
+    'redhat' => 'tomcat',
+  }
+
   file { $solr_dist_dir:
     ensure => directory,
     require => [Package["tomcat6"],Exec["unpack-solr"]],
     source => "${tmp_dir}/${package}/dist/",
     recurse => true,
-    group   => "tomcat6",
-    owner   => "tomcat6",
+    group   => $tomcat_user,
+    owner   => $tomcat_user,
   }
 
   # unpack solr dist into home directory
@@ -78,8 +83,8 @@ class solr::install ($source_url, $home_dir, $solr_data_dir, $package, $cores, $
     require => [Package["tomcat6"],Exec["unpack-solr"]],
     source => "${tmp_dir}/$package/example/solr",
     recurse => true,
-    group   => "tomcat6",
-    owner   => "tomcat6",
+    group   => $tomcat_user
+    owner   => $tomcat_user,
   }
 
   file { "/etc/tomcat6/Catalina/localhost/solr.xml":
@@ -87,8 +92,8 @@ class solr::install ($source_url, $home_dir, $solr_data_dir, $package, $cores, $
     content => template("solr/tomcat_solr.xml.erb"),
     require => [Package["tomcat6"],File[$solr_home_dir]],
     notify  => Service['tomcat6'],
-    group   => "tomcat6",
-    owner   => "tomcat6",
+    group   => $tomcat_user,
+    owner   => $tomcat_user,
   }
 
   # Tomcat config file
@@ -112,7 +117,7 @@ class solr::install ($source_url, $home_dir, $solr_data_dir, $package, $cores, $
   # Fix Tomcat config permissions
   exec { 'fix-tomcat-config-permissions':
     require => [Package["tomcat6"], File['tomcat-config']],
-    command => "chown tomcat6:tomcat6 /etc/tomcat6/server.xml",
+    command => "chown $tomcat_user:$tomcat_user /etc/tomcat6/server.xml",
     path => ["/bin", "/usr/bin", "/usr/sbin"],
   }
 
@@ -129,7 +134,7 @@ class solr::install ($source_url, $home_dir, $solr_data_dir, $package, $cores, $
     ensure => present,
     content => template("solr/solr.xml.erb"),
     notify  => Service['tomcat6'],
-    group   => "tomcat6",
-    owner   => "tomcat6",
+    group   => $tomcat_user,
+    owner   => $tomcat_user,
   }
 }
