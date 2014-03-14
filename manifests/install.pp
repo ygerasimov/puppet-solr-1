@@ -12,7 +12,8 @@ class solr::install ($source_url, $home_dir, $solr_data_dir, $package, $cores, $
       }
     }
     'redhat': {
-      package {"java-1.6.0-openjdk.$::hardwaremodel":
+      package { 'openjdk-6-jdk':
+        name => "java-1.6.0-openjdk.$::hardwaremodel",
         ensure => present,
       }
     }
