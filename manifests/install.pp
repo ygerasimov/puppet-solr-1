@@ -83,7 +83,7 @@ class solr::install ($source_url, $home_dir, $solr_data_dir, $package, $cores, $
     require => [Package["tomcat6"],Exec["unpack-solr"]],
     source => "${tmp_dir}/$package/example/solr",
     recurse => true,
-    group   => $tomcat_user
+    group   => $tomcat_user,
     owner   => $tomcat_user,
   }
 
