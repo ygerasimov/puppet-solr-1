@@ -17,7 +17,7 @@ class solr::install ($source_url, $home_dir, $solr_data_dir, $package, $cores, $
         ensure => present,
       }
       package { 'openjdk-6-jdk-devel':
-        name => "java-devel",
+        name => "java-1.6.0-openjdk-devel",
         ensure => present,
       }
     }
