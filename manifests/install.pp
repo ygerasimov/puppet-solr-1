@@ -42,6 +42,7 @@ class solr::install ($source_url, $home_dir, $solr_data_dir, $package, $cores, $
     cwd => "$tmp_dir",
     path => ["/bin", "/usr/bin", "/usr/sbin"],
     require => Exec["solr_home_dir"],
+    timeout => 0,
   }
 
   exec { "unpack-solr":
