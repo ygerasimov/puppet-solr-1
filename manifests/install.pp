@@ -5,8 +5,17 @@ class solr::install ($source_url, $home_dir, $solr_data_dir, $package, $cores, $
   $solr_home_dir = "${home_dir}"
   $destination = "$tmp_dir/$package.tgz"
 
-  package {"openjdk-6-jdk":
-    ensure => present,
+  case $::osfamily {
+    'debian': {
+      package {"openjdk-6-jdk":
+        ensure => present,
+      }
+    }
+    'redhat': {
+      package {"java-1.6.0-openjdk.$::hardwaremodel":
+        ensure => present,
+      }
+    }
   }
   package {"tomcat6":
     ensure => present,
