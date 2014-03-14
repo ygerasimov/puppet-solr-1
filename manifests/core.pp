@@ -1,4 +1,9 @@
 define solr::core($core_name = $title, $base_data_dir, $solr_home) {
+
+  $tomcat_user = $::osfamily ? {
+    'debian' => 'tomcat6',
+    'redhat' => 'tomcat',
+  }
   
   #Create this core's config directory
   exec { "mkdir-p-${core_name}":
@@ -20,15 +25,15 @@ define solr::core($core_name = $title, $base_data_dir, $solr_home) {
   file { "${core_name}-data-dir":
     ensure => directory,
     path => "${base_data_dir}/${core_name}",
-    owner => "tomcat6",
-    group => "tomcat6",
+    owner => $tomcat_user,
+    group => $tomcat_user,
     require => Exec["mkdir-p-config-${core_name}"],
   }
   
   file { ["${solr_home}/${core_name}/", "${solr_home}/${core_name}/conf/"]:
     ensure => directory,
-    owner => "tomcat6",
-    group => "tomcat6",
+    owner => $tomcat_user,
+    group => $tomcat_user,
     require => Exec["mkdir-p-${core_name}"],
   }
 
@@ -38,8 +43,8 @@ define solr::core($core_name = $title, $base_data_dir, $solr_home) {
     path => "${solr_home}/${core_name}/conf/solrconfig.xml",
     content => template('solr/solrconfig.xml.erb'),
     require => File["${solr_home}/${core_name}/conf/"],
-    group   => "tomcat6",
-    owner   => "tomcat6",
+    group   => $tomcat_user,
+    owner   => $tomcat_user,
   }
 
   #Copy the respective schema.xml file
@@ -48,7 +53,7 @@ define solr::core($core_name = $title, $base_data_dir, $solr_home) {
     path => "${solr_home}/${core_name}/conf/schema.xml",
     content => template('solr/schema.xml.erb'),
     require => File["${solr_home}/${core_name}/conf/"],
-    group   => "tomcat6",
-    owner   => "tomcat6",
+    group   => $tomcat_user,
+    owner   => $tomcat_user,
   }  
 }
